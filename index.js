@@ -8,13 +8,15 @@ const EXPRESS_PORT = 3001;
 const wss = new WebSocket.Server({ port: WS_PORT });
 const app = express();
 
-const clients = new Map();
-
 wss.on('connection', (ws) => {
-  clients.set(ws);
+  console.log('connection established');
 
   ws.on('close', () => {
-    clients.delete(ws);
+    console.log('client disconnected');
+  });
+
+  ws.on('message', (messageAsString) => {
+    console.log('message received FROM client: ', JSON.parse(messageAsString));
   });
 });
 
@@ -29,12 +31,12 @@ app.post('/ws', (req, res) => {
       client.send(JSON.stringify(req.body));
     }
   });
-  console.log(req.body);
+  console.log('message sent to client: ', req.body);
   res.send('success');
 });
 
 app.listen(EXPRESS_PORT, () => {
-  console.log(`Example app listening on port ${EXPRESS_PORT}`);
+  console.log(`WebSocket app listening on port ${EXPRESS_PORT}`);
 });
 
 open('http://localhost:3001');
